@@ -24,7 +24,8 @@ h1, h2 { font-family: "Libre Franklin", "Segoe UI", Arial, sans-serif; color: va
 h1 { font-size: 1.5rem; }
 h1 small { display: block; font-size: 0.9rem; font-weight: 600; color: var(--muted); }
 .lead { color: var(--muted); max-width: 40rem; margin: 0; }
-.options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
 a.option { display: grid; gap: 10px; padding: 28px; background: #fff; border: 1px solid var(--rule); border-top: 4px solid var(--navy); text-decoration: none; color: var(--ink); min-width: 0; }
 a.option:hover, a.option:focus-visible { border-top-color: var(--teal); outline: none; box-shadow: 0 10px 28px rgba(15,42,68,.12); }
 a.option h2 { font-size: 1.25rem; }
@@ -36,10 +37,11 @@ a.option span { color: var(--teal); font-weight: 600; }
 <body>
 <main>
   <header><img src="v2/assets/esca_icon_256.png" alt="ESCA logo"><h1>ESCA Geoscience<small>Website drafts for review</small></h1></header>
-  <p class="lead">Two design directions for esca-geosciences.com. Both use the tagline "Bring illumination from depth."</p>
+  <p class="lead">Three design directions for the ESCA Geoscience website. All use the tagline "Bring illumination from depth." Versions 2 and 3 carry the current company content: GGR studies, field work, ESCA Subsurface, ESCA Imaging and custom software.</p>
   <div class="options">
-    <a class="option" href="v2/"><h2>Version 2: Company profile</h2><p>Light corporate layout with ESCA Subsurface screenshots, About us, capabilities, sectors and contact.</p><span>Open version 2 →</span></a>
-    <a class="option" href="v1/"><h2>Version 1: Dark product page</h2><p>Dark layout in the app's brand colours, with an animated strata cross section.</p><span>Open version 1 →</span></a>
+    <a class="option" href="v3/"><h2>Version 3: Editorial</h2><p>Large type, section names in a left column, the tagline explained as two definitions, and a dark seismic band.</p><span>Open version 3 →</span></a>
+    <a class="option" href="v2/"><h2>Version 2: Company profile</h2><p>Light corporate layout: navy header, About us, GGR studies, field work, software with screenshots, and contact.</p><span>Open version 2 →</span></a>
+    <a class="option" href="v1/"><h2>Version 1: Dark product page</h2><p>Dark layout in the app's brand colours, with an animated strata cross section. Earlier content (software only).</p><span>Open version 1 →</span></a>
   </div>
 </main>
 </body>
