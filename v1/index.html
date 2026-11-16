@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESCA Geoscience</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="ESCA Geoscience builds ESCA Subsurface, one desktop app for end-to-end subsurface geoscience: wells, logs, seismic interpretation and 3-D reservoir models.">
+<link rel="icon" type="image/png" href="assets/esca_icon_256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one long dark "core" read top to bottom — a strata hero, then bands of content
+   separated like formation tops, each with a depth-style label in the margin. */
+:root {
+  --abyss: #0d1b26;      /* page ground, the deep */
+  --basin: #132635;      /* raised surfaces */
+  --line: #24394a;       /* hairlines, formation tops */
+  --bone: #ece6d8;       /* the fish: primary text */
+  --silt: #93a7b5;       /* secondary text */
+  --lure: #4fd6c8;       /* the light: accent */
+  --sand: #c9a46b;       /* strata: sandstone */
+  --shale: #8a5a3c;      /* strata: shale */
+  --font-display: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --max: 1120px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--abyss);
+  color: var(--bone);
+  font: 400 16px/1.6 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+a { color: var(--lure); }
+:focus-visible { outline: 2px solid var(--lure); outline-offset: 3px; border-radius: 4px; }
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-left: var(--gutter-l);
+  padding-right: var(--gutter-r);
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h2 { font-weight: 300; font-size: clamp(1.9rem, 4vw, 2.75rem); line-height: 1.15; letter-spacing: -0.01em; }
+h2 b { font-weight: 600; color: var(--lure); }
+h3 { font-weight: 600; font-size: 1.15rem; letter-spacing: 0.01em; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); }
+.eyebrow {
+  font: 500 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lure);
+}
+
+/* ---------- nav ---------- */
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--abyss);
+}
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--abyss) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 24px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--bone); }
+.brand img { width: 34px; height: 34px; border-radius: 8px; }
+.brand span { font: 400 1.15rem/1 var(--font-display); letter-spacing: 0.02em; }
+.brand span b { font-weight: 600; }
+.nav ul { list-style: none; display: flex; gap: 22px; margin: 0 0 0 auto; padding: 0; }
+.nav ul a { color: var(--silt); text-decoration: none; font-size: 0.9rem; }
+.nav ul a:hover { color: var(--bone); }
+@media (max-width: 640px) { .nav ul li:not(:last-child) { display: none; } }
+
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero .wrap { position: relative; padding-block: clamp(56px, 10vw, 112px) clamp(140px, 22vw, 230px); }
+.hero-copy { max-width: 36rem; display: grid; gap: 22px; }
+.hero h1 {
+  font-weight: 300;
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.hero h1 b { font-weight: 600; color: var(--lure); text-shadow: 0 0 32px color-mix(in srgb, var(--lure) 45%, transparent); }
+.hero p.lead { color: var(--silt); font-size: 1.12rem; max-width: 32rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; border-radius: 999px;
+  font: 500 0.95rem/1 var(--font-body); text-decoration: none;
+  border: 1px solid var(--line); color: var(--bone); background: transparent; cursor: pointer;
+}
+.btn.primary { background: var(--lure); border-color: var(--lure); color: var(--abyss); }
+.btn:hover { border-color: var(--lure); }
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* ---------- facts strip ---------- */
+.facts { border-bottom: 1px solid var(--line); background: var(--basin); }
+.facts .wrap { display: grid; grid-template-columns: repeat(4, 1fr); padding-block: 0; }
+.fact { padding: 22px 18px; border-left: 1px solid var(--line); display: grid; gap: 4px; }
+.fact:first-child { border-left: 0; padding-left: 0; }
+.fact strong { font: 300 2rem/1 var(--font-display); color: var(--bone); font-variant-numeric: tabular-nums; }
+.fact span { color: var(--silt); font-size: 0.85rem; }
+@media (max-width: 760px) {
+  .facts .wrap { grid-template-columns: repeat(2, 1fr); }
+  .fact:nth-child(3) { border-left: 0; padding-left: 0; }
+  .fact:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* ---------- formation bands ---------- */
+.band { border-bottom: 1px solid var(--line); }
+.band > .wrap { padding-block: clamp(56px, 8vw, 96px); display: grid; gap: 40px; }
+.band-head { display: grid; grid-template-columns: 140px 1fr; gap: 24px; align-items: start; }
+.depth {
+  font: 400 0.75rem/1.4 var(--font-mono); color: var(--silt);
+  border-top: 2px solid var(--sand); padding-top: 8px; font-variant-numeric: tabular-nums;
+}
+.depth em { display: block; font-style: normal; color: var(--sand); letter-spacing: 0.1em; text-transform: uppercase; }
+.band-head > div { display: grid; gap: 14px; min-width: 0; }
+.band-head p { color: var(--silt); max-width: 40rem; }
+@media (max-width: 760px) { .band-head { grid-template-columns: 1fr; gap: 14px; } .depth { max-width: 160px; } }
+
+/* ---------- domains ---------- */
+.domains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.domain { background: var(--abyss); padding: 26px 24px 28px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.domain svg { width: 40px; height: 40px; }
+.domain p { color: var(--silt); font-size: 0.95rem; }
+.domain ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.domain li {
+  font: 400 0.72rem/1 var(--font-mono); color: var(--bone);
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px;
+}
+@media (max-width: 900px) { .domains { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .domains { grid-template-columns: 1fr; } }
+
+/* ---------- workflow ---------- */
+.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: step; }
+.flow li { position: relative; padding: 20px 22px 0 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.flow li::before {
+  counter-increment: step; content: "0" counter(step);
+  font: 500 0.8rem/1 var(--font-mono); color: var(--lure);
+}
+.flow li::after {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--lure), color-mix(in srgb, var(--lure) 15%, transparent));
+}
+.flow p { color: var(--silt); font-size: 0.93rem; }
+@media (max-width: 760px) { .flow { grid-template-columns: 1fr 1fr; row-gap: 28px; } }
+@media (max-width: 460px) { .flow { grid-template-columns: 1fr; } }
+
+/* ---------- principles ---------- */
+.principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 48px; }
+.principle { display: grid; grid-template-columns: 28px 1fr; gap: 14px; min-width: 0; }
+.principle .tick { width: 10px; height: 10px; margin-top: 8px; border-radius: 50%; background: var(--lure); box-shadow: 0 0 12px var(--lure); }
+.principle div { display: grid; gap: 6px; min-width: 0; }
+.principle p { color: var(--silt); font-size: 0.95rem; }
+@media (max-width: 700px) { .principles { grid-template-columns: 1fr; } }
+
+/* ---------- roadmap ---------- */
+.road { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.stage { border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 10px; align-content: start; }
+.stage.now { border-color: color-mix(in srgb, var(--lure) 55%, var(--line)); background: color-mix(in srgb, var(--lure) 6%, var(--abyss)); }
+.chip { justify-self: start; font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--silt); }
+.now .chip { color: var(--abyss); background: var(--lure); border-color: var(--lure); }
+.stage p { color: var(--silt); font-size: 0.93rem; }
+@media (max-width: 760px) { .road { grid-template-columns: 1fr; } }
+
+/* ---------- contact ---------- */
+.contact { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+.contact-copy { display: grid; gap: 14px; min-width: 0; }
+.contact-copy p { color: var(--silt); }
+.mail { border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 14px; background: var(--basin); min-width: 0; }
+.mail .addr { font: 500 1.1rem/1.3 var(--font-mono); color: var(--bone); overflow-wrap: anywhere; user-select: all; }
+.mail .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mail small { color: var(--silt); font-size: 0.8rem; min-height: 1.2em; }
+@media (max-width: 760px) { .contact { grid-template-columns: 1fr; } }
+
+footer .wrap { padding-block: 28px; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; color: var(--silt); font-size: 0.85rem; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/esca_icon_256.png" alt=""><span><b>ESCA</b> Geoscience</span></a>
+    <ul>
+      <li><a href="#product">Product</a></li>
+      <li><a href="#workflow">Workflow</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <canvas id="strata" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">ESCA Subsurface · desktop software</span>
+      <h1>Bring illumination <b>from depth.</b></h1>
+      <p class="lead">One application for the whole subsurface story: well logs, stratigraphy, seismic interpretation and 3-D reservoir models, in one project and one data tree.</p>
+      <div class="actions">
+        <a class="btn primary" href="#contact">Request a demo</a>
+        <a class="btn" href="#product">See what it does</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="facts" aria-label="ESCA Subsurface in numbers">
+  <div class="wrap">
+    <div class="fact"><strong>6</strong><span>geoscience disciplines in one app</span></div>
+    <div class="fact"><strong>15</strong><span>seismic attributes, chainable as workflows</span></div>
+    <div class="fact"><strong>116</strong><span>FGDC lithology patterns</span></div>
+    <div class="fact"><strong>psi + ppg</strong><span>every pressure, both forms</span></div>
+  </div>
+</section>
+
+<section class="band" id="product">
+  <div class="wrap">
+    <div class="band-head">
+      <div class="depth"><em>Product</em>Top 1,000 m</div>
+      <div>
+        <h2>ESCA Subsurface: <b>end to end</b>, from log to model.</h2>
+        <p>Geoscientists lose days moving data between a petrophysics package, a seismic package and a modelling package. ESCA Subsurface keeps the disciplines in one project, so a re-picked shale volume flows straight into porosity, pore pressure and the 3-D model.</p>
+      </div>
+    </div>
+
+    <div class="domains">
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 4v32" stroke="var(--silt)" stroke-width="1.5"/><path d="M20 4c6 3-4 6 3 9s-6 5 2 8-5 6 1 9 -3 4 2 6" stroke="var(--lure)" stroke-width="2" fill="none"/><path d="M32 4v32" stroke="var(--silt)" stroke-width="1.5"/></svg>
+        <h3>Petrophysics</h3>
+        <p>LAS import onto one regular depth index, shale volume, nine porosity methods and deterministic lithology from matrix lines.</p>
+        <ul><li>Density</li><li>Neutron</li><li>Sonic</li><li>N-D crossplot</li><li>Gas correction</li></ul>
+      </article>
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4 12c8-4 14 2 32-2" stroke="var(--sand)" stroke-width="2"/><path d="M4 22c10-3 16 3 32-1" stroke="var(--shale)" stroke-width="2"/><path d="M4 32c9-2 15 2 32 0" stroke="var(--lure)" stroke-width="2"/><circle cx="10" cy="11" r="2" fill="var(--bone)"/><circle cx="30" cy="10" r="2" fill="var(--bone)"/></svg>
+        <h3>Stratigraphy &amp; correlation</h3>
+        <p>Zone sets, automatic marker correlation along each well path, interactive zone editing on the log, and cross sections with correlation lines.</p>
+        <ul><li>TVDSS</li><li>Well groups</li><li>Fence diagrams</li></ul>
+      </article>
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><g stroke="var(--lure)" stroke-width="1.4"><path d="M8 3c3 5-3 8 0 12s3 8 0 12 3 8 0 10"/><path d="M16 3c3 6-3 8 0 13s3 7 0 11 3 8 0 10"/><path d="M24 3c3 6-3 9 0 14s3 6 0 10 3 8 0 10"/><path d="M32 3c3 7-3 9 0 14s3 6 0 10 3 8 0 10"/></g><path d="M4 21c10-5 22 4 32-2" stroke="var(--sand)" stroke-width="2"/></svg>
+        <h3>Seismic &amp; interpretation</h3>
+        <p>SEG-Y and ZGY linked without copying, 2-D lines and 3-D surveys, horizon and fault picking, the well–seismic tie and volume rendering.</p>
+        <ul><li>SEG-Y</li><li>ZGY</li><li>Attributes</li><li>Well tie</li></ul>
+      </article>
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M6 14l14-8 14 8-14 8z" stroke="var(--lure)" stroke-width="1.5"/><path d="M6 14v12l14 8 14-8V14" stroke="var(--silt)" stroke-width="1.5"/><path d="M20 22v12M13 10l14 8M27 10l-14 8" stroke="var(--silt)" stroke-width="1"/></svg>
+        <h3>3-D grids &amp; geostatistics</h3>
+        <p>Pillar grids, upscaling, variograms and trends, then property propagation by kriging or sequential Gaussian simulation, zone by zone and facies by facies.</p>
+        <ul><li>Simple kriging</li><li>Ordinary kriging</li><li>Universal kriging</li><li>SGS</li></ul>
+      </article>
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 4c2 10 4 20 4 32" stroke="var(--silt)" stroke-width="1.5"/><path d="M14 4c3 10 6 20 10 32" stroke="var(--lure)" stroke-width="2"/><path d="M20 4c4 10 8 20 14 32" stroke="var(--shale)" stroke-width="1.5"/><path d="M14 4c3 10 6 20 10 32L34 36C28 26 24 14 20 4z" fill="var(--lure)" opacity=".15"/></svg>
+        <h3>Pore pressure &amp; mud window</h3>
+        <p>Overburden, compaction trend, pore pressure by Eaton and Bowers, fracture and collapse gradients, and the safe mud window, drawn against the measured tests.</p>
+        <ul><li>Eaton</li><li>Bowers</li><li>Matthews-Kelly</li><li>Daines</li></ul>
+      </article>
+      <article class="domain">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><g fill="var(--lure)"><circle cx="9" cy="12" r="2.5"/><circle cx="13" cy="8" r="2"/><circle cx="12" cy="15" r="2"/></g><g fill="var(--sand)"><circle cx="28" cy="13" r="2.5"/><circle cx="31" cy="9" r="2"/><circle cx="25" cy="10" r="2"/></g><g fill="var(--shale)"><circle cx="19" cy="29" r="2.5"/><circle cx="23" cy="32" r="2"/><circle cx="16" cy="32" r="2"/></g><path d="M4 22h32" stroke="var(--line)" stroke-dasharray="2 3"/></svg>
+        <h3>Machine learning</h3>
+        <p>Train regression, classification and clustering models on your wells, then write the predicted log straight back to the project.</p>
+        <ul><li>Regression</li><li>Facies classification</li><li>Clustering</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="workflow">
+  <div class="wrap">
+    <div class="band-head">
+      <div class="depth"><em>Workflow</em>Top 2,150 m</div>
+      <div>
+        <h2>One project, <b>four steps</b>, no exports in between.</h2>
+        <p>Every result is written back into the same project and shows up in the same data tree, ready for the next discipline.</p>
+      </div>
+    </div>
+    <ol class="flow">
+      <li><h3>Load</h3><p>LAS, deviation surveys, formation tops, core and pressure tests, SEG-Y and ZGY volumes, ZMap+ and CPS-3 grids.</p></li>
+      <li><h3>Interpret</h3><p>Compute petrophysical logs, paint facies, pick horizons and faults, and tie wells to seismic.</p></li>
+      <li><h3>Correlate</h3><p>Correlate markers between wells, check them on cross sections and maps, and grid the surfaces.</p></li>
+      <li><h3>Model</h3><p>Build the 3-D grid, upscale logs, fit variograms and propagate properties through the reservoir.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" id="principles">
+  <div class="wrap">
+    <div class="band-head">
+      <div class="depth"><em>Principles</em>Top 2,870 m</div>
+      <div>
+        <h2>Built the way <b>geoscientists</b> work.</h2>
+      </div>
+    </div>
+    <div class="principles">
+      <div class="principle"><span class="tick"></span><div><h3>Calculations checked against measurements</h3><p>A computed curve is drawn beside the data that can prove it wrong: core plugs on porosity, pressure tests on pore pressure, leak-off tests on fracture gradient.</p></div></div>
+      <div class="principle"><span class="tick"></span><div><h3>Your data stays readable</h3><p>Projects are plain folders of text tables and JSON documents. Large seismic files are linked where they are, never duplicated.</p></div></div>
+      <div class="principle"><span class="tick"></span><div><h3>Workflows you can re-run</h3><p>Link several tools into one chain. Change the shale cutoff and every curve built on it updates on the next run.</p></div></div>
+      <div class="principle"><span class="tick"></span><div><h3>Runs on your machine</h3><p>A native Windows application that keeps working offline. Licences are per module, so you pay for the disciplines you use.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="roadmap">
+  <div class="wrap">
+    <div class="band-head">
+      <div class="depth"><em>Roadmap</em>Top 3,400 m</div>
+      <div>
+        <h2>From static model to <b>moving fluids</b>.</h2>
+        <p>Our goal is one product family that covers the whole subsurface.</p>
+      </div>
+    </div>
+    <div class="road">
+      <div class="stage now"><span class="chip">Available</span><h3>ESCA Subsurface</h3><p>Petrophysics, stratigraphy, seismic interpretation and static reservoir modelling.</p></div>
+      <div class="stage"><span class="chip">Next</span><h3>Geomechanics</h3><p>Stress, rock strength and wellbore stability as a dedicated product on the same platform.</p></div>
+      <div class="stage"><span class="chip">Later</span><h3>Fluid flow simulation</h3><p>Take the static model into flow, so the reservoir story runs from the first log to production.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="contact">
+  <div class="wrap">
+    <div class="contact">
+      <div class="contact-copy">
+        <span class="eyebrow">Contact</span>
+        <h2>See ESCA Subsurface on <b>your data</b>.</h2>
+        <p>Tell us about your field and your workflow. We will set up a demo, a trial licence, or a pilot on one of your projects.</p>
+      </div>
+      <div class="mail">
+        <span class="eyebrow">Email</span>
+        <span class="addr" id="addr">info@esca-geosciences.com</span>
+        <div class="row">
+          <a class="btn primary" href="mailto:info@esca-geosciences.com">Write to us</a>
+          <button class="btn" id="copy" type="button">Copy address</button>
+        </div>
+        <small id="copied" aria-live="polite"></small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 ESCA Geoscience</span>
+    <span class="mono">esca-geosciences.com</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* Copy the email address */
+  var btn = document.getElementById("copy");
+  var note = document.getElementById("copied");
+  var addr = document.getElementById("addr");
+  btn.addEventListener("click", function () {
+    var text = addr.textContent.trim();
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(addr);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      note.textContent = "Address selected. Press Ctrl+C to copy.";
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { note.textContent = "Copied to clipboard."; }, selectIt);
+    } catch (e) { selectIt(); }
+  });
+
+  /* Hero: strata cross section with seismic traces, a deviated well and the lure's light */
+  var cv = document.getElementById("strata");
+  var ctx = cv.getContext("2d");
+  var css = getComputedStyle(document.documentElement);
+  function tok(n) { return css.getPropertyValue(n).trim(); }
+  var C = { abyss: tok("--abyss"), basin: tok("--basin"), line: tok("--line"), bone: tok("--bone"),
+            silt: tok("--silt"), lure: tok("--lure"), sand: tok("--sand"), shale: tok("--shale") };
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var W = 0, H = 0, DPR = 1;
+
+  function horizon(x, base, amp, ph) {
+    return base + Math.sin(x / W * 5.2 + ph) * amp + Math.sin(x / W * 13 + ph * 2) * amp * 0.25 - x / W * H * 0.08;
+  }
+  var layers = [
+    { base: 0.62, amp: 14, ph: 0.3, fill: C.lure,  a: 0.10 },
+    { base: 0.70, amp: 16, ph: 0.6, fill: C.sand,  a: 0.30 },
+    { base: 0.79, amp: 15, ph: 0.9, fill: C.shale, a: 0.32 },
+    { base: 0.88, amp: 12, ph: 1.2, fill: C.silt,  a: 0.18 }
+  ];
+
+  function draw(t) {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, C.abyss); g.addColorStop(1, C.basin);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    /* strata */
+    for (var i = 0; i < layers.length; i++) {
+      var L = layers[i];
+      ctx.beginPath(); ctx.moveTo(0, H);
+      for (var x = 0; x <= W; x += 8) ctx.lineTo(x, horizon(x, L.base * H, L.amp, L.ph));
+      ctx.lineTo(W, H); ctx.closePath();
+      ctx.globalAlpha = L.a; ctx.fillStyle = L.fill; ctx.fill();
+      ctx.globalAlpha = i === 0 ? 0.9 : 0.35; ctx.strokeStyle = i === 0 ? C.lure : L.fill; ctx.lineWidth = i === 0 ? 1.5 : 1;
+      ctx.beginPath();
+      for (x = 0; x <= W; x += 8) { var y = horizon(x, L.base * H, L.amp, L.ph); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    /* seismic traces: wiggles with positive lobes filled, brighter on the horizons */
+    var top = layers[0].base * H - 60;
+    for (var tx = W * 0.42; tx < W; tx += 18) {
+      ctx.beginPath(); var started = false;
+      for (var ty = top; ty < H; ty += 3) {
+        var refl = 0;
+        for (var k = 0; k < layers.length; k++) {
+          var d = ty - horizon(tx, layers[k].base * H, layers[k].amp, layers[k].ph);
+          refl += Math.exp(-d * d / 60) * (k % 2 ? -1 : 1);
+        }
+        var noise = Math.sin(ty * 0.21 + tx * 0.05) * 0.18;
+        var wx = tx + (refl + noise) * 7;
+        started ? ctx.lineTo(wx, ty) : (ctx.moveTo(wx, ty), started = true);
+      }
+      ctx.strokeStyle = C.bone; ctx.globalAlpha = 0.16; ctx.lineWidth = 1; ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    /* deviated well with a gamma-ray style log */
+    var wx0 = W * 0.80, wy0 = H * 0.40;
+    ctx.beginPath(); ctx.moveTo(wx0, wy0);
+    ctx.quadraticCurveTo(wx0 + 6, H * 0.70, wx0 - W * 0.06, H);
+    ctx.strokeStyle = C.silt; ctx.globalAlpha = 0.9; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath();
+    for (var s = 0; s <= 1; s += 0.01) {
+      var px = (1 - s) * (1 - s) * wx0 + 2 * (1 - s) * s * (wx0 + 6) + s * s * (wx0 - W * 0.06);
+      var py = (1 - s) * (1 - s) * wy0 + 2 * (1 - s) * s * (H * 0.70) + s * s * H;
+      var gr = Math.sin(s * 40) * 4 + Math.sin(s * 97) * 3 + (py > layers[2].base * H ? 6 : 0);
+      s ? ctx.lineTo(px - 10 - gr, py) : ctx.moveTo(px - 10 - gr, py);
+    }
+    ctx.strokeStyle = C.lure; ctx.globalAlpha = 0.7; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    /* the lure's light at the wellhead */
+    var pulse = reduce ? 1 : 0.85 + Math.sin(t / 900) * 0.15;
+    var rad = Math.max(60, W * 0.08) * pulse;
+    var glow = ctx.createRadialGradient(wx0, wy0, 0, wx0, wy0, rad);
+    glow.addColorStop(0, C.lure); glow.addColorStop(0.08, C.lure);
+    glow.addColorStop(0.3, "rgba(79,214,200,0.25)"); glow.addColorStop(1, "rgba(79,214,200,0)");
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(wx0, wy0, rad, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function resize() {
+    var r = cv.getBoundingClientRect();
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    draw(performance.now());
+  }
+  window.addEventListener("resize", resize);
+  resize();
+  if (!reduce) {
+    (function loop(t) { draw(t); requestAnimationFrame(loop); })(performance.now());
+  }
+})();
+</script>
+</body>
+</html>
